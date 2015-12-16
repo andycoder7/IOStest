@@ -32,16 +32,17 @@
 
 //定义每一个section中有多少row，可以通过对参数section的判定返回不同的值
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return 2;
+    return 50;
 }
 
 //定义每个row中cell的内容
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    UILabel *cellTitle = nil;
     //用于资源reuse的标示符，必须要有，具体自行google
-    static NSString *cellIdentifier = @"cellIdentifier";
+    NSString *cellIdentifier = [NSString stringWithFormat:@"cellIdentifier%ld_%ld",(long)indexPath.section, (long)indexPath.row];
+//    NSString *cellIdentifier = [NSString stringWithFormat:@"cellIdentifier%ld",(long)indexPath.section];
     //初始化cell
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
-    
     if (cell == nil) {
         switch (indexPath.section) {
             case 0:
@@ -51,6 +52,7 @@
                 cell.detailTextLabel.text = @"子标题";
                 //右侧的附加类别显示为：箭头
                 cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+            
                 break;
             case 1:
                 //有子标题的style
@@ -76,35 +78,42 @@
                 //右侧的附加类别显示为：勾选
                 cell.accessoryType = UITableViewCellAccessoryCheckmark;
                 break;
-            case 4:{
-                //不设置style的话默认使用default Style，可以通过对cell addsubview 来自定义cell的内容
-                cell = [[UITableViewCell alloc]initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 35)];
-                UILabel *cellTitle = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 35)];
+            case 4:
+                NSLog(@"%@",cellIdentifier);
+//                如果这样实例化cell的话，将不会放入cell的重用队列
+//                cell = [[UITableViewCell alloc]initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 35)];
+                cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
+                cellTitle = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 35)];
                 [cellTitle setTextAlignment:NSTextAlignmentCenter];
-                cellTitle.text = @"标题";
+                cellTitle.text = [NSString stringWithFormat:@"标题%ld_%ld",(long)indexPath.section, (long)indexPath.row];
                 [cell addSubview:cellTitle];
                 //右侧的附加类别也可以是一个自定义的view
                 cell.accessoryView = [[UISwitch alloc]init];
                 break;
-                //由于oc中不支持在case中申明变量，所以需要加这对大括号，如果要去掉的话，只要把cellTitle的申明放在外面就好了
-            }
             default:
                 break;
         }
+    } else {
+        NSLog(@"I'm not nil!!!!\n\n");
     }
     //对所有的cell添加图片
     cell.imageView.image = [UIImage imageNamed:@"tableViewCellImage.png"];
-    //对所有的cell的边框宽度设为1，方便看到边框的形状
-    cell.layer.borderWidth = 1;
-    //对边框的颜色进行设定
-    [cell.layer setBorderColor:[UIColor lightGrayColor].CGColor];
+//    //对所有的cell的边框宽度设为1，方便看到边框的形状
+//    cell.layer.borderWidth = 1;
+//    //对边框的颜色进行设定
+//    [cell.layer setBorderColor:[UIColor lightGrayColor].CGColor];
+    
+    //ios7之后，UITabelView内容使用margin layout，所以设置分割线位置会失败，这里把这个这个设定关了
+//    [cell setPreservesSuperviewLayoutMargins:NO];
+//    [cell setSeparatorInset:UIEdgeInsetsMake(0, 10, 0, 10)];
+//    [cell setLayoutMargins:UIEdgeInsetsZero];
     
     return cell;
 }
 
 //定义每个row的高度
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    return 35;
+    return 45;
 }
 //定义每个section上方空白区域的高度
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
@@ -138,5 +147,7 @@
     [view addSubview:label];
     return view;
 }
-
+- (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section {
+    return 0.1;
+}
 @end
